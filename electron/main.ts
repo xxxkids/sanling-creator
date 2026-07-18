@@ -28,6 +28,11 @@ export const RENDERER_DIST = path.join(__dirname, '../renderer')
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
+// 开发模式使用独立数据目录，避免与已安装应用冲突
+if (VITE_DEV_SERVER_URL) {
+  app.setPath('userData', path.join(app.getPath('appData'), '三领漫剧-dev'))
+}
+
 let win: BrowserWindow | null
 
 type PackageUpdateConfig = {
