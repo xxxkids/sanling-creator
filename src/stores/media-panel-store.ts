@@ -9,13 +9,11 @@ import {
   MapPinIcon,
   FileTextIcon,
   FilmIcon,
-  SparklesIcon,
-  PaletteIcon,
   LayoutDashboardIcon,
   FolderOpenIcon,
   LucideIcon,
   MicIcon,
-  MusicIcon,
+  PaletteIcon,
 } from "lucide-react";
 import { create } from "zustand";
 import type { CharacterIdentityAnchors, CharacterNegativePrompt } from "@/types/script";

@@ -1,7 +1,7 @@
 // 三领导演 v6.1 分镜表解析器
 // 将三领导演输出的分镜表格式解析为 APP 内部数据结构
 
-import type { ShotSizeType, DurationType, CameraMovementType, EmotionTag } from '@/stores/director-presets';
+import type { ShotSizeType, DurationType, EmotionTag } from '@/stores/director-presets';
 
 // ==================== 解析结果的类型 ====================
 
