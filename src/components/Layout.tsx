@@ -19,6 +19,7 @@ import { ScriptView } from "@/components/panels/script";
 import { DirectorView } from "@/components/panels/director";
 import { SClassView } from "@/components/panels/sclass";
 import { VideoView } from "@/components/panels/VideoView";
+import { VoiceView } from "@/components/panels/VoiceView";
 import { CharactersView } from "@/components/panels/characters";
 import { ScenesView } from "@/components/panels/scenes";
 import { FreedomView } from "@/components/panels/freedom";
@@ -78,6 +79,8 @@ export function Layout() {
         return <DirectorView />;
       case "video":
         return <VideoView />;
+      case "voice":
+        return <VoiceView />;
       case "characters":
         return <CharactersView />;
       case "scenes":
