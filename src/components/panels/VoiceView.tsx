@@ -1,8 +1,8 @@
 // 语音板块 — 角色配音管理 + 批量 TTS 生成
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useScriptStore } from "@/stores/script-store";
-import { useVoiceStore, DEFAULT_VOICE_PRESETS, type VoiceProfile, type VoicePreset } from "@/stores/voice-store";
+import { useVoiceStore, DEFAULT_VOICE_PRESETS, type VoicePreset } from "@/stores/voice-store";
 import { useCharacterLibraryStore } from "@/stores/character-library-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

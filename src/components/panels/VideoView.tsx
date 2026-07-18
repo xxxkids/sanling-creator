@@ -67,6 +67,7 @@ export function VideoView() {
       const groupScenes = splitScenes.slice(i, i + 9);
       const first = groupScenes[0];
       const last = groupScenes[groupScenes.length - 1];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const totalDuration = groupScenes.reduce((sum, s) => sum + ((s as any).duration ?? 5), 0);
       groups.push({
         id: `clip_${String(groups.length + 1).padStart(2, "0")}`,
@@ -75,7 +76,9 @@ export function VideoView() {
         shotRange: `${first?.id ?? "?"}-${last?.id ?? "?"}`,
         duration: totalDuration,
         status: "generating_storyboard",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         characterRefs: (first as any)?.characterIds ?? [],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sceneRefId: (first as any)?.sceneAnchorId,
         propRefs: [],
       });

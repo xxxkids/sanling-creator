@@ -151,6 +151,7 @@ export const useVoiceStore = create<VoiceStore>()(
 
       importDialogues: (projectId, dialogues) => {
         get().ensureProject(projectId);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const now = Date.now();
         const records: DialogueLine[] = dialogues.map((d) => ({
           ...d,
@@ -221,6 +222,7 @@ export const useVoiceStore = create<VoiceStore>()(
 
       clearProject: (projectId) => {
         set((s) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [projectId]: _, ...rest } = s.projects;
           return { projects: rest };
         });
@@ -242,7 +244,7 @@ export const useVoiceStore = create<VoiceStore>()(
 export async function synthesizeSpeech(
   text: string,
   voiceId: string,
-  options: { speed?: number; pitch?: number; volume?: number } = {}
+  options: Record<string, unknown> = {}
 ): Promise<string> {
   // TODO: 接入火山引擎 TTS API
   // POST https://openspeech.bytedance.com/api/v1/tts
@@ -252,6 +254,7 @@ export async function synthesizeSpeech(
   //
   // 返回 base64 音频 → 转 Blob URL
 
+  void options; // TODO: use for speed/pitch/volume when API wired
   await new Promise((r) => setTimeout(r, 300)); // simulate
   return `voice://${voiceId}/${encodeURIComponent(text.substring(0, 20))}`;
 }

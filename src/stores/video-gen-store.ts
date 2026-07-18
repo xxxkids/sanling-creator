@@ -315,6 +315,7 @@ export const useVideoGenStore = create<VideoGenStore>()(
 
       clearProject: (projectId) => {
         set((s) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [projectId]: _, ...rest } = s.projects;
           return { projects: rest };
         });
