@@ -106,7 +106,7 @@ function getDefaultBaiduCode() {
 async function fetchUpdateManifest() {
   const manifestUrl = getUpdateManifestUrl()
   if (!manifestUrl) {
-    throw new Error('未配置版本清单地址')
+    return null // 未配置更新服务器，静默跳过
   }
 
   const requestUrl = new URL(manifestUrl)
@@ -142,7 +142,7 @@ async function fetchUpdateManifest() {
 
 async function resolveAvailableUpdate(currentVersion: string): Promise<AvailableUpdateInfo | null> {
   const manifest = await fetchUpdateManifest()
-  if (compareVersions(manifest.version, currentVersion) <= 0) {
+  if (!manifest || compareVersions(manifest.version, currentVersion) <= 0) {
     return null
   }
 
