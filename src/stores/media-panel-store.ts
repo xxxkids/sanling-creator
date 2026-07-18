@@ -14,12 +14,14 @@ import {
   LayoutDashboardIcon,
   FolderOpenIcon,
   LucideIcon,
+  MicIcon,
+  MusicIcon,
 } from "lucide-react";
 import { create } from "zustand";
 import type { CharacterIdentityAnchors, CharacterNegativePrompt } from "@/types/script";
 
 // Tab-based navigation (simpler flat structure)
-export type Tab = "dashboard" | "overview" | "script" | "characters" | "scenes" | "freedom" | "director" | "sclass" | "assets" | "media" | "export" | "settings";
+export type Tab = "dashboard" | "overview" | "script" | "characters" | "scenes" | "freedom" | "director" | "video" | "voice" | "assets" | "media" | "export" | "settings";
 
 export interface NavItem {
   id: Tab;
@@ -35,11 +37,12 @@ export const mainNavItems: NavItem[] = [
   { id: "characters", label: "角色", icon: UsersIcon, phase: "02" },
   { id: "scenes", label: "场景", icon: MapPinIcon, phase: "02" },
   { id: "director", label: "导演", icon: ClapperboardIcon, phase: "03" },
-  { id: "sclass", label: "S级", icon: SparklesIcon, phase: "03" },
+  { id: "video", label: "视频", icon: VideoIcon, phase: "04" },
+  { id: "voice", label: "语音", icon: MicIcon, phase: "05" },
   { id: "assets", label: "资产", icon: FolderOpenIcon },
   { id: "media", label: "素材", icon: VideoIcon },
-  { id: "export", label: "导出", icon: FilmIcon, phase: "04" },
-  { id: "freedom", label: "自由", icon: PaletteIcon, phase: "02" },
+  { id: "export", label: "导出", icon: FilmIcon },
+  { id: "freedom", label: "自由", icon: PaletteIcon },
 ];
 
 // Bottom navigation items
@@ -71,7 +74,8 @@ export const tabs: { [key in Tab]: { icon: LucideIcon; label: string; stage?: St
   scenes: { icon: MapPinIcon, label: "场景", stage: "assets" },
   freedom: { icon: PaletteIcon, label: "自由" },
   director: { icon: ClapperboardIcon, label: "导演", stage: "director" },
-  sclass: { icon: SparklesIcon, label: "S级", stage: "director" },
+  video: { icon: VideoIcon, label: "视频", stage: "director" },
+  voice: { icon: MicIcon, label: "语音" },
   assets: { icon: FolderOpenIcon, label: "资产" },
   media: { icon: VideoIcon, label: "素材" },
   export: { icon: FilmIcon, label: "导出", stage: "export" },

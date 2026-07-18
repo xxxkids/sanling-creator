@@ -481,11 +481,11 @@ export interface APIConfigStatus {
 
 /**
  * 供应商信息映射
- * 1. memefast - 魔因API，全功能 AI 中转（推荐）
+ * 1. memefast - 三领API，全功能 AI 中转（推荐）
  * 2. runninghub - RunningHub，视角切换/多角度生成
  */
 const PROVIDER_INFO: Record<ProviderId, { name: string; services: ServiceType[] }> = {
-  memefast: { name: '魔因API', services: ['chat', 'image', 'video', 'vision'] },
+  memefast: { name: '三领API', services: ['chat', 'image', 'video', 'vision'] },
   runninghub: { name: 'RunningHub', services: ['image', 'vision'] },
   openai: { name: 'OpenAI', services: [] },
   custom: { name: 'Custom', services: [] },

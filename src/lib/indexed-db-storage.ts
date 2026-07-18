@@ -160,7 +160,7 @@ export const fileStorage: StateStorage = {
 const getFromIndexedDB = (name: string): Promise<string | null> => {
   return new Promise((resolve) => {
     try {
-      const request = indexedDB.open('moyin-creator-db', 1);
+      const request = indexedDB.open('sanling-creator-db', 1);
       request.onerror = () => resolve(null);
       request.onsuccess = () => {
         const db = request.result;
@@ -183,7 +183,7 @@ const getFromIndexedDB = (name: string): Promise<string | null> => {
 const removeFromIndexedDB = (name: string): Promise<void> => {
   return new Promise((resolve) => {
     try {
-      const request = indexedDB.open('moyin-creator-db', 1);
+      const request = indexedDB.open('sanling-creator-db', 1);
       request.onerror = () => resolve();
       request.onsuccess = () => {
         const db = request.result;

@@ -79,7 +79,7 @@ export const useAppSettingsStore = create<AppSettingsState & AppSettingsActions>
         })),
     }),
     {
-      name: "moyin-app-settings",
+      name: "sanling-app-settings",
       storage: createJSONStorage(() => fileStorage),
     }
   )

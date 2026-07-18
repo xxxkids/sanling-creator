@@ -159,7 +159,7 @@ async function resolveAvailableUpdate(currentVersion: string): Promise<Available
 
 function createWindow() {
   win = new BrowserWindow({
-    title: '魔因漫创',
+    title: '三领漫剧',
     width: 1400,
     height: 900,
     minWidth: 1200,
@@ -1205,7 +1205,7 @@ ipcMain.handle('storage-export-data', async (_event, targetPath: string) => {
     if (!targetPath) return { success: false, error: '路径不能为空' }
     const exportDir = path.join(
       normalizePath(targetPath),
-      `moyin-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
+      `sanling-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
     )
     
     // Create export structure
@@ -1243,7 +1243,7 @@ ipcMain.handle('storage-import-data', async (_event, sourcePath: string) => {
     }
     
     // Create temporary backup for rollback
-    const backupDir = path.join(os.tmpdir(), `moyin-backup-${Date.now()}`)
+    const backupDir = path.join(os.tmpdir(), `sanling-backup-${Date.now()}`)
     const currentProjectsDir = getProjectDataRoot()
     const currentMediaDir = getMediaRoot()
     
@@ -1347,7 +1347,7 @@ ipcMain.handle('storage-export-project-data', async (_event, targetPath: string)
     if (!targetPath) return { success: false, error: '路径不能为空' }
     const exportDir = path.join(
       normalizePath(targetPath),
-      `moyin-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
+      `sanling-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
     )
     ensureDir(path.join(exportDir, 'projects'))
     ensureDir(path.join(exportDir, 'media'))
@@ -1368,7 +1368,7 @@ ipcMain.handle('storage-import-project-data', async (_event, sourcePath: string)
 
     const currentProjectsDir = getProjectDataRoot()
     const currentMediaDir = getMediaRoot()
-    const backupDir = path.join(os.tmpdir(), `moyin-legacy-import-backup-${Date.now()}`)
+    const backupDir = path.join(os.tmpdir(), `sanling-legacy-import-backup-${Date.now()}`)
 
     try {
       if (fs.existsSync(currentProjectsDir)) {
@@ -1427,7 +1427,7 @@ ipcMain.handle('storage-export-media-data', async (_event, targetPath: string) =
     if (!targetPath) return { success: false, error: '路径不能为空' }
     const exportDir = path.join(
       normalizePath(targetPath),
-      `moyin-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
+      `sanling-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
     )
     ensureDir(path.join(exportDir, 'projects'))
     ensureDir(path.join(exportDir, 'media'))
@@ -1447,7 +1447,7 @@ ipcMain.handle('storage-import-media-data', async (_event, sourcePath: string) =
     const source = normalizePath(sourcePath)
     if (source === target) return { success: true }
 
-    const backupDir = path.join(os.tmpdir(), `moyin-media-import-backup-${Date.now()}`)
+    const backupDir = path.join(os.tmpdir(), `sanling-media-import-backup-${Date.now()}`)
 
     try {
       if (fs.existsSync(target)) {
@@ -1618,12 +1618,12 @@ function copyDirSync(src: string, dest: string) {
 
 /**
  * Seed demo project data on first run.
- * Checks if moyin-project-store.json exists in the project data root.
+ * Checks if sanling-project-store.json exists in the project data root.
  * If not, copies demo data (JSON + media) to the user's storage directory.
  */
 function seedDemoProject() {
   const projectDataRoot = getProjectDataRoot()
-  const marker = path.join(projectDataRoot, 'moyin-project-store.json')
+  const marker = path.join(projectDataRoot, 'sanling-project-store.json')
 
   if (fs.existsSync(marker)) {
     // Not first run — project store already exists

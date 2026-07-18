@@ -11,7 +11,7 @@ export function RightPanel() {
   const renderContent = () => {
     switch (activeTab) {
       case "director":
-      case "sclass":
+      case "video":
         return (
           <div className="flex-1 min-w-0 overflow-hidden">
             <DirectorContextPanel />

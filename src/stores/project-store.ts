@@ -29,7 +29,7 @@ interface ProjectStore {
 // Default project for desktop app
 const DEFAULT_PROJECT: Project = {
   id: "default-project",
-  name: "魔因漫创项目",
+  name: "三领漫创项目",
   createdAt: Date.now(),
   updatedAt: Date.now(),
 };
@@ -116,7 +116,7 @@ export const useProjectStore = create<ProjectStore>()(
       },
     }),
     {
-      name: "moyin-project-store",
+      name: "sanling-project-store",
       storage: createJSONStorage(() => fileStorage),
       partialize: (state) => ({
         projects: state.projects,
@@ -155,9 +155,9 @@ export const useProjectStore = create<ProjectStore>()(
  * 将未在 projects 列表中注册的项目自动恢复。
  * 
  * 解决以下场景：
- * - 更改存储路径并迁移数据后，前端 store 未 reload，或 moyin-project-store.json
+ * - 更改存储路径并迁移数据后，前端 store 未 reload，或 sanling-project-store.json
  *   中的 projects 列表不完整（旧版本、手动复制等）
- * - 导入数据后 moyin-project-store.json 缺失或不含新项目
+ * - 导入数据后 sanling-project-store.json 缺失或不含新项目
  * - 换电脑后指向旧数据目录，projects 列表为空
  */
 async function discoverProjectsFromDisk(): Promise<void> {

@@ -65,7 +65,7 @@ export function Layout() {
   }
 
   // Only show timeline for director and media tabs
-  const showTimeline = activeTab === "director" || activeTab === "sclass" || activeTab === "media";
+  const showTimeline = activeTab === "director" || activeTab === "video" || activeTab === "media";
 
   // Left panel content based on active tab
   const renderLeftPanel = () => {
@@ -75,7 +75,7 @@ export function Layout() {
       case "director":
         // 保持原有 AI 导演功能
         return <DirectorView />;
-      case "sclass":
+      case "video":
         return <SClassView />;
       case "characters":
         return <CharactersView />;

@@ -200,7 +200,7 @@ export const useFreedomStore = create<FreedomStore>()(
       },
     }),
     {
-      name: 'moyin-freedom',
+      name: 'sanling-freedom',
       version: 1,
     }
   )

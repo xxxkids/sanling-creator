@@ -797,7 +797,7 @@ export const useSClassStore = create<SClassStore>()(
       reset: () => set(initialState),
     }),
     {
-      name: 'moyin-sclass-store',
+      name: 'sanling-sclass-store',
       storage: createJSONStorage(() => createProjectScopedStorage('sclass')),
       partialize: (state) => {
         const pid = state.activeProjectId;

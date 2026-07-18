@@ -459,13 +459,13 @@ export function SettingsPanel() {
       
       // 清除 localStorage 中的缓存，确保从新路径加载数据
       const keysToRemove = Object.keys(localStorage).filter(key => 
-        key.startsWith('moyin-') || key.includes('store')
+        key.startsWith('sanling-') || key.includes('store')
       );
       keysToRemove.forEach(key => localStorage.removeItem(key));
       
       // 清除 IndexedDB 缓存
       try {
-        const dbRequest = indexedDB.open('moyin-creator-db', 1);
+        const dbRequest = indexedDB.open('sanling-creator-db', 1);
         dbRequest.onsuccess = () => {
           const db = dbRequest.result;
           if (db.objectStoreNames.contains('zustand-storage')) {
@@ -505,13 +505,13 @@ export function SettingsPanel() {
     if (result.success) {
       // 清除 localStorage 中的缓存，防止旧数据覆盖导入的数据
       const keysToRemove = Object.keys(localStorage).filter(key => 
-        key.startsWith('moyin-') || key.includes('store')
+        key.startsWith('sanling-') || key.includes('store')
       );
       keysToRemove.forEach(key => localStorage.removeItem(key));
       
       // 清除 IndexedDB 缓存
       try {
-        const dbRequest = indexedDB.open('moyin-creator-db', 1);
+        const dbRequest = indexedDB.open('sanling-creator-db', 1);
         dbRequest.onsuccess = () => {
           const db = dbRequest.result;
           if (db.objectStoreNames.contains('zustand-storage')) {
@@ -556,13 +556,13 @@ export function SettingsPanel() {
       
       // 清除 localStorage 中的缓存，确保从新路径加载数据
       const keysToRemove = Object.keys(localStorage).filter(key => 
-        key.startsWith('moyin-') || key.includes('store')
+        key.startsWith('sanling-') || key.includes('store')
       );
       keysToRemove.forEach(key => localStorage.removeItem(key));
       
       // 清除 IndexedDB 缓存
       try {
-        const dbRequest = indexedDB.open('moyin-creator-db', 1);
+        const dbRequest = indexedDB.open('sanling-creator-db', 1);
         dbRequest.onsuccess = () => {
           const db = dbRequest.result;
           if (db.objectStoreNames.contains('zustand-storage')) {
@@ -719,7 +719,7 @@ export function SettingsPanel() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-foreground text-sm flex items-center gap-2">
-                魔因API
+                三领API
                 <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded">
                   推荐
                 </span>
@@ -751,7 +751,7 @@ export function SettingsPanel() {
                   尚未配置任何供应商
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  推荐使用魔因API，支持 543+ 模型一站式接入
+                  推荐使用三领API，支持 543+ 模型一站式接入
                 </p>
                 <a
                   href="https://memefast.top"
@@ -760,7 +760,7 @@ export function SettingsPanel() {
                   className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline mb-4"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  前往魔因API获取 Key
+                  前往三领API获取 Key
                 </a>
                 <Button onClick={() => setAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" />
@@ -957,7 +957,7 @@ export function SettingsPanel() {
                               className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
                             >
                               <ExternalLink className="h-3 w-3" />
-                              前往魔因API获取 Key →
+                              前往三领API获取 Key →
                             </a>
                           </div>
                         )}
@@ -1048,7 +1048,7 @@ export function SettingsPanel() {
 
               {/* About */}
               <div className="text-center py-8 text-muted-foreground border-t border-border">
-                <p className="text-sm font-medium">魔因漫创 Moyin Creator</p>
+                <p className="text-sm font-medium">三领漫创 Moyin Creator</p>
                 <p className="text-xs mt-1">v{appVersion} · AI 驱动的动漫视频创作工具</p>
               </div>
             </div>
@@ -1194,7 +1194,7 @@ export function SettingsPanel() {
 
               {/* About */}
               <div className="text-center py-8 text-muted-foreground border-t border-border">
-                <p className="text-sm font-medium">魔因漫创 Moyin Creator</p>
+                <p className="text-sm font-medium">三领漫创 Moyin Creator</p>
                 <p className="text-xs mt-1">v{appVersion} · AI 驱动的动漫视频创作工具</p>
               </div>
             </div>
@@ -1314,7 +1314,7 @@ export function SettingsPanel() {
 
               {/* About */}
               <div className="text-center py-8 text-muted-foreground border-t border-border">
-                <p className="text-sm font-medium">魔因漫创 Moyin Creator</p>
+                <p className="text-sm font-medium">三领漫创 Moyin Creator</p>
                 <p className="text-xs mt-1">v{appVersion} · AI 驱动的动漫视频创作工具</p>
               </div>
             </div>
@@ -1583,7 +1583,7 @@ export function SettingsPanel() {
 
               {/* About */}
               <div className="text-center py-8 text-muted-foreground border-t border-border">
-                <p className="text-sm font-medium">魔因漫创 Moyin Creator</p>
+                <p className="text-sm font-medium">三领漫创 Moyin Creator</p>
                 <p className="text-xs mt-1">v{appVersion} · AI 驱动的动漫视频创作工具</p>
               </div>
             </div>
@@ -1596,7 +1596,7 @@ export function SettingsPanel() {
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
         onSubmit={(providerData) => {
-          // 魔因API：已存在时合并 Key，不重复创建
+          // 三领API：已存在时合并 Key，不重复创建
           const existingMemefast = providerData.platform === 'memefast'
             ? providers.find((p) => p.platform === 'memefast')
             : null;

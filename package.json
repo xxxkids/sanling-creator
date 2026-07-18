@@ -1,8 +1,8 @@
 {
-  "name": "moyin-creator",
-  "productName": "魔因漫创",
+  "name": "sanling-creator",
+  "productName": "三领漫剧",
   "version": "0.2.3",
-  "description": "AI 驱动的动漫/短剧分镜创作工具",
+  "description": "三领文化 AI 影视生产工具",
   "author": "MemeCalculate",
   "license": "AGPL-3.0-or-later",
   "repository": {
