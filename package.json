@@ -21,7 +21,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "electron-vite dev",
+    "dev": "npx vite",
     "build": "npm run build:mac",
     "build:desktop": "node ./scripts/build-desktop.mjs",
     "build:win": "node ./scripts/build-desktop.mjs --win",

@@ -23,14 +23,8 @@ import {
   Loader2,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import {
-  VendorEngine,
-  VendorConfig,
-  VendorCallResult,
-  DEFAULT_VENDOR_TEMPLATE,
-  vendorRegistry,
-  type VendorModel,
-} from '@/utils/vendor'
+import { compileVendorIPC, testVendorIPC } from '@/utils/vendor-api'
+import type { VendorConfig } from '@/utils/vendor'
 
 const STORAGE_KEY = 'sanling:vendor-configs'
 
@@ -55,7 +49,6 @@ export function VendorConfigPanel() {
   const [isDirty, setIsDirty] = useState(false)
   const [isCompiling, setIsCompiling] = useState(false)
   const [compileError, setCompileError] = useState<string | null>(null)
-  const [compiledEngines, setCompiledEngines] = useState<Map<number, VendorEngine>>(new Map())
   const [testResult, setTestResult] = useState<string | null>(null)
   const [isTesting, setIsTesting] = useState(false)
 
@@ -81,7 +74,27 @@ export function VendorConfigPanel() {
       models: [
         { id: 'default', name: 'Default', type: 'text', capabilities: ['text'] },
       ],
-      sourceCode: DEFAULT_VENDOR_TEMPLATE,
+      sourceCode: `/**
+ * 自定义供应商
+ * 暴露 text(), image(), video() 三个方法
+ */
+export async function text({ model, messages, apiKey }: any) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages })
+  })
+  return response.json()
+}
+
+export async function image({ model, prompt, apiKey }: any) {
+  const response = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, prompt })
+  })
+  return response.json()
+}`,
       enabled: true,
     }
     const updated = [...configs, newConfig]
@@ -99,7 +112,6 @@ export function VendorConfigPanel() {
     setConfigs(updated)
     setSelectedIndex(Math.min(selectedIndex, updated.length - 1))
     saveConfigs(updated)
-    vendorRegistry.unregister(selected.id)
     toast.success('已删除')
   }
 
@@ -123,23 +135,19 @@ export function VendorConfigPanel() {
     setCompileError(null)
 
     try {
-      const engine = new VendorEngine(config)
-      await engine.initialize()
-
-      // 注册到全局注册中心
-      vendorRegistry.register(config)
-
-      setCompiledEngines(prev => {
-        const next = new Map(prev)
-        next.set(configs.indexOf(config), engine)
-        return next
-      })
+      // 通过 IPC 编译
+      const result = await compileVendorIPC(config)
+      if (result) {
+        setCompileError(null)
+      } else {
+        setCompileError('编译失败')
+      }
     } catch (err) {
       setCompileError(err instanceof Error ? err.message : String(err))
     } finally {
       setIsCompiling(false)
     }
-  }, [configs])
+  }, [])
 
   // 测试调用
   const handleTest = async () => {
@@ -148,19 +156,12 @@ export function VendorConfigPanel() {
     setIsTesting(true)
 
     try {
-      // 先编译
-      const engine = new VendorEngine(selected)
-      await engine.initialize()
-
-      const result = await engine.call('text', {
-        model: selected.models[0]?.id || 'default',
-        messages: [{ role: 'user', content: 'Hello, say "ok" and nothing else.' }],
-      })
-
-      if (result.error) {
-        setTestResult(`❌ ${result.error}`)
+      // 通过 IPC 测试
+      const result = await testVendorIPC(selected)
+      if (result.success) {
+        setTestResult(`✅ 编译成功\n${result.output?.slice(0, 300)}`)
       } else {
-        setTestResult(`✅ 响应: ${result.text?.slice(0, 200)}\n⏱ ${result.duration?.toFixed(0)}ms`)
+        setTestResult(`❌ ${result.output?.slice(0, 300)}`)
       }
     } catch (err) {
       setTestResult(`❌ ${err instanceof Error ? err.message : String(err)}`)

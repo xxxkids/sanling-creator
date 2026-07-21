@@ -4,16 +4,20 @@
  * 设置面板中的「提示词管理」板块
  * - 浏览所有 Skill 文件
  * - 查看/编辑 Markdown 内容
- * - 实时保存，自动热重载
+ * - 实时保存
+ *
+ * 通过 IPC 调用主进程的 Skills 操作（fs/path/electron 仅在主进程可用）
  */
 
 import { useState, useEffect, useCallback } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import { BookOpen, FileText, Save, RotateCcw, Search } from 'lucide-react'
-import { scanSkills, loadSkill, saveSkill, watchSkills, type SkillMeta } from '@/utils/skills'
 import { toast } from 'sonner'
+import { scanSkillsIPC, loadSkillIPC, saveSkillIPC } from '@/utils/skills-api'
+import type { SkillMeta } from '@/utils/skills'
 
 export function SkillsPanel() {
   const [skills, setSkills] = useState<SkillMeta[]>([])
@@ -23,198 +27,177 @@ export function SkillsPanel() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isDirty, setIsDirty] = useState(false)
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [isLoading, setIsLoading] = useState(true)
 
-  // 刷新 Skill 列表
-  const refreshSkills = useCallback(() => {
-    const list = scanSkills()
-    setSkills(list)
+  // 刷新 Skill 列表（异步 IPC）
+  const refreshSkills = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const list = await scanSkillsIPC()
+      setSkills(list)
+    } catch (err) {
+      console.error('[SkillsPanel] refresh failed:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
 
-  // 初始化 + 文件监听
+  // 初始化
   useEffect(() => {
     refreshSkills()
-    const unwatch = watchSkills(() => {
-      refreshSkills()
-      // 如果当前选中的文件被外部修改，重新加载
-      if (selectedSkill) {
-        const fresh = loadSkill(selectedSkill.id)
-        if (fresh !== null && fresh !== originalContent) {
-          setContent(fresh)
-          setOriginalContent(fresh)
-        }
-      }
-    })
-    return unwatch
-  }, [refreshSkills, selectedSkill, originalContent])
+  }, [refreshSkills])
 
   // 选中一个 Skill
-  const handleSelect = (skill: SkillMeta) => {
+  const handleSelect = async (skill: SkillMeta) => {
     if (isDirty) {
-      const confirmed = window.confirm('当前编辑内容未保存，是否放弃？')
-      if (!confirmed) return
+      const confirm = window.confirm('有未保存的修改，确定切换吗？')
+      if (!confirm) return
     }
-    const text = loadSkill(skill.id)
-    if (text !== null) {
-      setSelectedSkill(skill)
-      setContent(text)
-      setOriginalContent(text)
-      setIsDirty(false)
-    } else {
-      toast.error('无法加载文件')
+    setIsDirty(false)
+    setSelectedSkill(skill)
+    try {
+      const text = await loadSkillIPC(skill.id)
+      setContent(text ?? '')
+      setOriginalContent(text ?? '')
+    } catch {
+      setContent('# 加载失败')
+      setOriginalContent('# 加载失败')
     }
   }
 
   // 保存
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedSkill) return
-    const ok = saveSkill(selectedSkill.id, content)
-    if (ok) {
-      setOriginalContent(content)
-      setIsDirty(false)
-      toast.success(`已保存: ${selectedSkill.title}`)
-    } else {
-      toast.error('保存失败')
+    try {
+      const ok = await saveSkillIPC(selectedSkill.id, content)
+      if (ok) {
+        setOriginalContent(content)
+        setIsDirty(false)
+        toast.success('已保存')
+      } else {
+        toast.error('保存失败')
+      }
+    } catch {
+      toast.error('保存失败（IPC 错误）')
     }
   }
 
-  // 重置到原始内容
-  const handleReset = () => {
-    setContent(originalContent)
-    setIsDirty(false)
+  // 内容变更
+  const handleContentChange = (val: string) => {
+    setContent(val)
+    setIsDirty(val !== originalContent)
   }
 
-  // 分类
-  const categories = ['all', ...new Set(skills.map(s => s.category).filter(Boolean))] as string[]
-
-  // 过滤
-  const filtered = skills.filter(s => {
+  // 过滤后的分类列表
+  const categories = Array.from(new Set(skills.map(s => s.category || '未分类')))
+  const filteredSkills = skills.filter(s => {
     if (categoryFilter !== 'all' && s.category !== categoryFilter) return false
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      return s.title.toLowerCase().includes(q) || s.id.toLowerCase().includes(q)
-    }
+    if (searchQuery && !s.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
     return true
   })
 
   return (
     <div className="flex h-full">
-      {/* 左侧：Skill 列表 */}
-      <div className="w-72 border-r border-border flex flex-col flex-shrink-0">
-        <div className="p-3 border-b border-border space-y-2">
+      {/* 左侧列表 */}
+      <div className="w-64 border-r border-border flex flex-col">
+        <div className="p-3 space-y-2">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="搜索提示词..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="pl-8 h-9"
+              className="pl-8 h-9 text-xs"
             />
           </div>
           <div className="flex gap-1 flex-wrap">
+            <button
+              onClick={() => setCategoryFilter('all')}
+              className={`px-2 py-0.5 text-xs rounded ${categoryFilter === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+            >
+              全部
+            </button>
             {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
-                className={`text-xs px-2 py-1 rounded ${
-                  categoryFilter === cat
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted hover:bg-muted/80'
-                }`}
+                className={`px-2 py-0.5 text-xs rounded ${categoryFilter === cat ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
               >
-                {cat === 'all' ? '全部' : cat === 'director_rules' ? '导演规则' : cat}
+                {cat || '未分类'}
               </button>
             ))}
           </div>
+          <Button variant="outline" size="sm" className="w-full" onClick={refreshSkills} disabled={isLoading}>
+            <RotateCcw className={`h-3 w-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+            刷新
+          </Button>
         </div>
-
         <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {filtered.map(skill => (
+          <div className="space-y-0.5 px-2 pb-3">
+            {filteredSkills.map(skill => (
               <button
                 key={skill.id}
                 onClick={() => handleSelect(skill)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center gap-2 transition-colors ${
+                className={`w-full text-left px-3 py-2 rounded text-xs transition-colors ${
                   selectedSkill?.id === skill.id
                     ? 'bg-primary/10 text-primary'
                     : 'hover:bg-muted'
                 }`}
               >
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium">{skill.title}</div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {skill.relativePath}
-                  </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{skill.title}</span>
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-0.5 pl-5">
+                  {skill.relativePath}
                 </div>
               </button>
             ))}
-            {filtered.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                {searchQuery ? '没有匹配的提示词文件' : '暂无提示词文件'}
-              </p>
+            {!isLoading && filteredSkills.length === 0 && (
+              <div className="text-xs text-muted-foreground text-center py-8">
+                {searchQuery ? '没有匹配的结果' : '暂无提示词文件'}
+              </div>
             )}
           </div>
         </ScrollArea>
-
-        <div className="p-3 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            共 {skills.length} 个提示词文件
-          </p>
-        </div>
       </div>
 
-      {/* 右侧：编辑区 */}
+      {/* 右侧编辑器 */}
       <div className="flex-1 flex flex-col">
         {selectedSkill ? (
           <>
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{selectedSkill.title}</span>
+                <Badge variant="outline" className="text-[10px]">
+                  {selectedSkill.category || '未分类'}
+                </Badge>
                 {isDirty && (
-                  <span className="text-xs text-amber-500 font-medium">● 已修改</span>
+                  <Badge variant="secondary" className="text-[10px] bg-orange-100 text-orange-600">
+                    未保存
+                  </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleReset}
-                  disabled={!isDirty}
-                >
-                  <RotateCcw className="h-4 w-4 mr-1" />
-                  重置
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={!isDirty}
-                >
-                  <Save className="h-4 w-4 mr-1" />
-                  保存
-                </Button>
-              </div>
+              <Button size="sm" onClick={handleSave} disabled={!isDirty}>
+                <Save className="h-3 w-3 mr-1" />
+                保存
+              </Button>
             </div>
-            <ScrollArea className="flex-1">
+            <div className="flex-1 p-0">
               <textarea
                 value={content}
-                onChange={e => {
-                  setContent(e.target.value)
-                  setIsDirty(e.target.value !== originalContent)
-                }}
-                className="w-full h-full p-4 font-mono text-sm bg-transparent resize-none focus:outline-none"
+                onChange={e => handleContentChange(e.target.value)}
+                className="w-full h-full bg-transparent border-0 p-4 text-sm font-mono resize-none focus:outline-none"
                 spellCheck={false}
               />
-            </ScrollArea>
+            </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            <div className="text-center">
-              <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">选择左侧提示词文件查看和编辑</p>
-              <p className="text-xs mt-1">
-                修改后点击保存，系统自动热重载
-              </p>
+          <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+            <div className="text-center space-y-2">
+              <BookOpen className="h-12 w-12 mx-auto opacity-20" />
+              <p>选择一个提示词文件查看或编辑</p>
             </div>
           </div>
         )}

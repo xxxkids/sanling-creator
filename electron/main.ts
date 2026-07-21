@@ -10,6 +10,9 @@ import os from 'node:os'
 import packageMetadata from '../package.json'
 import type { AvailableUpdateInfo, OpenExternalResult, UpdateCheckResult, UpdateManifest } from '../src/types/update'
 
+// 禁用硬件加速（解决 macOS 部分环境 GPU 进程崩溃导致的空白页）
+app.disableHardwareAcceleration()
+
 // electron-vite 构建后的目录结构
 //
 // ├─┬ out
