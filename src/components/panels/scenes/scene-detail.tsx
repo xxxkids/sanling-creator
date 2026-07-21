@@ -42,6 +42,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ImagePreviewModal } from "@/components/panels/director/media-preview-modal";
+import { SceneSpaceEditor } from "@/components/panels/scenes/SceneSpaceEditor";
 
 interface SceneDetailProps {
   scene: Scene | null;
@@ -468,6 +469,9 @@ export function SceneDetail({ scene }: SceneDetailProps) {
               删除场景
             </Button>
           </div>
+
+          {/* Scene Space */}
+          <SceneSpaceEditor scene={scene} />
 
           {/* Tips */}
           <div className="text-xs text-muted-foreground space-y-1">
