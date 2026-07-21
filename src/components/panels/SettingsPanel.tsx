@@ -76,6 +76,8 @@ import {
   RefreshCw,
   Upload,
   ExternalLink,
+  BookOpen,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -83,6 +85,7 @@ import { uploadToImageHost } from "@/lib/image-host";
 import { UpdateDialog } from "@/components/UpdateDialog";
 import type { AvailableUpdateInfo } from "@/types/update";
 import packageJson from "../../../package.json";
+import { SkillsPanel } from "@/components/panels/skills/SkillsPanel";
 
 // Platform icon mapping
 const PLATFORM_ICONS: Record<string, React.ReactNode> = {
@@ -688,6 +691,13 @@ export function SettingsPanel() {
             >
               <HardDrive className="h-4 w-4 mr-2" />
               存储
+            </TabsTrigger>
+            <TabsTrigger 
+              value="skills" 
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 h-12"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              提示词
             </TabsTrigger>
           </TabsList>
         </div>
@@ -1588,6 +1598,11 @@ export function SettingsPanel() {
               </div>
             </div>
           </ScrollArea>
+        </TabsContent>
+
+        {/* Skills Management Tab */}
+        <TabsContent value="skills" className="flex-1 overflow-hidden mt-0">
+          <SkillsPanel />
         </TabsContent>
       </Tabs>
 
