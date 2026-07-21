@@ -78,6 +78,7 @@ import {
   ExternalLink,
   BookOpen,
   FileText,
+  Code,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -86,6 +87,7 @@ import { UpdateDialog } from "@/components/UpdateDialog";
 import type { AvailableUpdateInfo } from "@/types/update";
 import packageJson from "../../../package.json";
 import { SkillsPanel } from "@/components/panels/skills/SkillsPanel";
+import { VendorConfigPanel } from "@/components/panels/vendors/VendorConfigPanel";
 
 // Platform icon mapping
 const PLATFORM_ICONS: Record<string, React.ReactNode> = {
@@ -698,6 +700,13 @@ export function SettingsPanel() {
             >
               <BookOpen className="h-4 w-4 mr-2" />
               提示词
+            </TabsTrigger>
+            <TabsTrigger 
+              value="vendors" 
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 h-12"
+            >
+              <Code className="h-4 w-4 mr-2" />
+              供应商
             </TabsTrigger>
           </TabsList>
         </div>
@@ -1603,6 +1612,11 @@ export function SettingsPanel() {
         {/* Skills Management Tab */}
         <TabsContent value="skills" className="flex-1 overflow-hidden mt-0">
           <SkillsPanel />
+        </TabsContent>
+
+        {/* Vendor Config Tab */}
+        <TabsContent value="vendors" className="flex-1 overflow-hidden mt-0">
+          <VendorConfigPanel />
         </TabsContent>
       </Tabs>
 
