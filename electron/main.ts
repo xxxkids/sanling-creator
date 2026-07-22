@@ -173,7 +173,13 @@ function createWindow() {
     minWidth: 1200,
     minHeight: 700,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.cjs'),
+      preload: (() => {
+        // vite-plugin-electron/simple: preload.mjs 在 dist-electron/ 目录
+        const simplePath = path.join(__dirname, 'preload.mjs')
+        if (fs.existsSync(simplePath)) return simplePath
+        // electron-vite: preload/index.cjs 在 out/ 目录
+        return path.join(__dirname, '../preload/index.cjs')
+      })(),
     },
   })
 
