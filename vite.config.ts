@@ -2,6 +2,7 @@ import { defineConfig, type Plugin } from 'vite'
 import path from 'node:path'
 import electron from 'vite-plugin-electron/simple'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 /**
  * Vite 插件：API CORS 代理
@@ -96,6 +97,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    tailwindcss(),
     apiCorsProxyPlugin(),
     react(),
     electron({
