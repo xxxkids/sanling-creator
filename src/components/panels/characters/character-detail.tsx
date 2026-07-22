@@ -427,6 +427,72 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
 
           <Separator />
 
+          {/* 语音 & 服化道 & 肖像 */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-medium text-muted-foreground">语音 & 服化道</h4>
+            
+            {/* 声线样本 */}
+            <div className="p-2 border border-border rounded bg-muted/30">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium">🎤 声线样本</span>
+                {character.referenceAudioUrl ? (
+                  <Badge variant="outline" className="text-[10px]">已上传</Badge>
+                ) : null}
+              </div>
+              {character.referenceAudioUrl ? (
+                <audio controls className="w-full h-8 mt-1">
+                  <source src={character.referenceAudioUrl} />
+                </audio>
+              ) : (
+                <p className="text-[10px] text-muted-foreground">暂无声线样本，可后续上传</p>
+              )}
+              {character.voiceSamples && Object.keys(character.voiceSamples).length > 0 && (
+                <div className="mt-1 space-y-1">
+                  {Object.entries(character.voiceSamples).map(([age, sample]) => (
+                    <div key={age} className="flex items-center gap-1 text-[10px]">
+                      <Badge variant="secondary" className="text-[9px]">{age}</Badge>
+                      <audio controls className="w-24 h-6">
+                        <source src={sample.url} />
+                      </audio>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 服化道 */}
+            {character.costumeImageUrl ? (
+              <div className="p-2 border border-border rounded bg-muted/30">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">👘 服化道</span>
+                </div>
+                <img
+                  src={character.costumeImageUrl}
+                  alt="服化道参考图"
+                  className="w-full h-24 object-cover rounded cursor-pointer"
+                  onClick={() => character.costumeImageUrl && setPreviewImageUrl(character.costumeImageUrl)}
+                />
+              </div>
+            ) : null}
+
+            {/* 肖像 */}
+            {character.portraitImageUrl ? (
+              <div className="p-2 border border-border rounded bg-muted/30">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">🖼️ 肖像</span>
+                </div>
+                <img
+                  src={character.portraitImageUrl}
+                  alt="角色肖像"
+                  className="w-full h-32 object-contain rounded cursor-pointer"
+                  onClick={() => character.portraitImageUrl && setPreviewImageUrl(character.portraitImageUrl)}
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <Separator />
+
           {/* Actions */}
           <div className="space-y-2">
             <Button

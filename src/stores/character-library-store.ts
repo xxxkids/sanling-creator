@@ -55,6 +55,14 @@ export interface CharacterVariation {
   episodeRange?: [number, number]; // 适用集数范围：[起始集, 结束集]
   ageDescription?: string;         // 该阶段年龄："25岁"、"50岁"
   stageDescription?: string;       // 阶段描述："创业初期"、"事业巅峰"
+  
+  // === 变体级语音/服化道 ===
+  referenceAudio?: string;         // 该变体专用声线
+  referenceAudioUrl?: string;
+  costumeImage?: string;           // 该变体服化道图
+  costumeImageUrl?: string;
+  portraitImage?: string;          // 该变体肖像
+  portraitImageUrl?: string;
 }
 
 export interface Character {
@@ -89,7 +97,22 @@ export interface Character {
   // === 6层身份锚点（角色一致性）===
   identityAnchors?: CharacterIdentityAnchors;  // 身份锚点 - 6层特征锁定
   negativePrompt?: CharacterNegativePrompt;    // 负面提示词
-  
+
+  // === 语音系统（角色级声线样本）===
+  referenceAudio?: string;         // 角色声线样本 URL/路径
+  referenceAudioUrl?: string;      // 外部访问 URL
+  voiceSamples?: Record<string, {  // 按年龄段的声线
+    path: string
+    url: string
+    sha256?: string
+    updatedAt?: number
+  }>
+  // === 服化道 & 肖像 ===
+  costumeImage?: string;           // 服化道参考图
+  costumeImageUrl?: string;
+  portraitImage?: string;          // 肖像/精修三视图
+  portraitImageUrl?: string;
+
   createdAt: number;
   updatedAt: number;
 }
