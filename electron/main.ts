@@ -1615,22 +1615,29 @@ ipcMain.handle('save-file-dialog', async (_event, { localPath, defaultPath, filt
  * Returns the file path and base64-encoded content.
  */
 ipcMain.handle('select-audio-file', async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [
-      { name: '音频文件', extensions: ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac'] },
-    ],
-  })
-  if (result.canceled || result.filePaths.length === 0) {
-    return { success: false }
-  }
-  const filePath = result.filePaths[0]
-  const buffer = fs.readFileSync(filePath)
-  return {
-    success: true,
-    filePath,
-    base64: buffer.toString('base64'),
-    mimeType: `audio/${filePath.endsWith('.mp3') ? 'mpeg' : filePath.endsWith('.wav') ? 'wav' : filePath.endsWith('.m4a') ? 'mp4' : filePath.endsWith('.aac') ? 'aac' : filePath.endsWith('.ogg') ? 'ogg' : 'mpeg'}`,
+  try {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        { name: '音频文件', extensions: ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac'] },
+      ],
+    })
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false }
+    }
+    const filePath = result.filePaths[0]
+    const buffer = fs.readFileSync(filePath)
+    const ext = filePath.split('.').pop()?.toLowerCase()
+    const mimeMap: Record<string, string> = { mp3: 'audio/mpeg', wav: 'audio/wav', m4a: 'audio/mp4', aac: 'audio/aac', ogg: 'audio/ogg', flac: 'audio/flac' }
+    return {
+      success: true,
+      filePath,
+      base64: buffer.toString('base64'),
+      mimeType: mimeMap[ext || ''] || 'audio/mpeg',
+    }
+  } catch (error) {
+    console.error('[select-audio-file] Error:', error)
+    return { success: false, error: String(error) }
   }
 })
 

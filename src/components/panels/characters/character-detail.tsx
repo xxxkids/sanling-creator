@@ -172,8 +172,17 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
   // 上传声线样本
   const handleUploadAudio = async () => {
     try {
-      const result = await (window as any).electronAPI?.selectAudioFile()
-      if (!result?.success) return
+      const api = (window as any).electronAPI
+      if (!api?.selectAudioFile) {
+        console.error('[UploadAudio] electronAPI not available')
+        toast.error('API 不可用，请确认 Electron 预加载正确')
+        return
+      }
+      const result = await api.selectAudioFile()
+      if (!result?.success) {
+        if (result?.error) console.error('[UploadAudio] IPC error:', result.error)
+        return  // 取消选择不弹错
+      }
       // 构造 data URL 并保存到角色
       const dataUrl = `data:${result.mimeType};base64,${result.base64}`
       updateCharacter(character.id, {
@@ -183,14 +192,19 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
       toast.success('声线样本已上传')
     } catch (err) {
       console.error('[UploadAudio] failed:', err)
-      toast.error('上传失败')
+      toast.error('上传失败: ' + (err instanceof Error ? err.message : String(err)))
     }
   }
 
   // 上传服化道/肖像图
   const handleUploadImage = async (field: 'costumeImage' | 'portraitImage') => {
     try {
-      const result = await (window as any).electronAPI?.selectImageFile()
+      const api = (window as any).electronAPI
+      if (!api?.selectImageFile) {
+        toast.error('API 不可用，请确认 Electron 预加载正确')
+        return
+      }
+      const result = await api.selectImageFile()
       if (!result?.success) return
       const dataUrl = `data:${result.mimeType};base64,${result.base64}`
       const urlField = field === 'costumeImage' ? 'costumeImageUrl' : 'portraitImageUrl'
@@ -201,7 +215,7 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
       toast.success(field === 'costumeImage' ? '服化道图已上传' : '肖像图已上传')
     } catch (err) {
       console.error('[UploadImage] failed:', err)
-      toast.error('上传失败')
+      toast.error('上传失败: ' + (err instanceof Error ? err.message : String(err)))
     }
   }
 
