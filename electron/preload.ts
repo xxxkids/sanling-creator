@@ -77,6 +77,8 @@ contextBridge.exposeInMainWorld('storageManager', {
 contextBridge.exposeInMainWorld('electronAPI', {
   saveFileDialog: (options: { localPath: string, defaultPath: string, filters: { name: string, extensions: string[] }[] }) =>
     ipcRenderer.invoke('save-file-dialog', options),
+  selectAudioFile: () => ipcRenderer.invoke('select-audio-file'),
+  selectImageFile: () => ipcRenderer.invoke('select-image-file'),
 })
 
 contextBridge.exposeInMainWorld('appUpdater', {

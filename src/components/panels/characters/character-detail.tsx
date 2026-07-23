@@ -169,6 +169,42 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
   const currentView = character.views[selectedViewIndex];
   const variationCount = character.variations?.length || 0;
 
+  // 上传声线样本
+  const handleUploadAudio = async () => {
+    try {
+      const result = await (window as any).electronAPI?.selectAudioFile()
+      if (!result?.success) return
+      // 构造 data URL 并保存到角色
+      const dataUrl = `data:${result.mimeType};base64,${result.base64}`
+      updateCharacter(character.id, {
+        referenceAudio: result.filePath,
+        referenceAudioUrl: dataUrl,
+      })
+      toast.success('声线样本已上传')
+    } catch (err) {
+      console.error('[UploadAudio] failed:', err)
+      toast.error('上传失败')
+    }
+  }
+
+  // 上传服化道/肖像图
+  const handleUploadImage = async (field: 'costumeImage' | 'portraitImage') => {
+    try {
+      const result = await (window as any).electronAPI?.selectImageFile()
+      if (!result?.success) return
+      const dataUrl = `data:${result.mimeType};base64,${result.base64}`
+      const urlField = field === 'costumeImage' ? 'costumeImageUrl' : 'portraitImageUrl'
+      updateCharacter(character.id, {
+        [field]: result.filePath,
+        [urlField]: dataUrl,
+      })
+      toast.success(field === 'costumeImage' ? '服化道图已上传' : '肖像图已上传')
+    } catch (err) {
+      console.error('[UploadImage] failed:', err)
+      toast.error('上传失败')
+    }
+  }
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -435,9 +471,14 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
             <div className="p-2 border border-border rounded bg-muted/30">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-medium">🎤 声线样本</span>
-                {character.referenceAudioUrl ? (
-                  <Badge variant="outline" className="text-[10px]">已上传</Badge>
-                ) : null}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-[10px]"
+                  onClick={handleUploadAudio}
+                >
+                  + 上传
+                </Button>
               </div>
               {character.referenceAudioUrl ? (
                 <audio controls className="w-full h-8 mt-1">
@@ -465,6 +506,14 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
               <div className="p-2 border border-border rounded bg-muted/30">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium">👘 服化道</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-[10px]"
+                    onClick={() => handleUploadImage('costumeImage')}
+                  >
+                    更换
+                  </Button>
                 </div>
                 <img
                   src={character.costumeImageUrl}
@@ -473,13 +522,35 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
                   onClick={() => character.costumeImageUrl && setPreviewImageUrl(character.costumeImageUrl)}
                 />
               </div>
-            ) : null}
+            ) : (
+              <div className="p-2 border border-dashed border-border rounded bg-muted/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">👘 服化道</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-[10px]"
+                    onClick={() => handleUploadImage('costumeImage')}
+                  >
+                    + 上传
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* 肖像 */}
             {character.portraitImageUrl ? (
               <div className="p-2 border border-border rounded bg-muted/30">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium">🖼️ 肖像</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-[10px]"
+                    onClick={() => handleUploadImage('portraitImage')}
+                  >
+                    更换
+                  </Button>
                 </div>
                 <img
                   src={character.portraitImageUrl}
@@ -488,7 +559,21 @@ export function CharacterDetail({ character }: CharacterDetailProps) {
                   onClick={() => character.portraitImageUrl && setPreviewImageUrl(character.portraitImageUrl)}
                 />
               </div>
-            ) : null}
+            ) : (
+              <div className="p-2 border border-dashed border-border rounded bg-muted/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">🖼️ 肖像</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-[10px]"
+                    onClick={() => handleUploadImage('portraitImage')}
+                  >
+                    + 上传
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />

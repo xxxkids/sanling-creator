@@ -1608,6 +1608,57 @@ ipcMain.handle('save-file-dialog', async (_event, { localPath, defaultPath, filt
   }
 })
 
+// ==================== File Selection Helpers ====================
+
+/**
+ * Select an audio file using the system dialog.
+ * Returns the file path and base64-encoded content.
+ */
+ipcMain.handle('select-audio-file', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [
+      { name: '音频文件', extensions: ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac'] },
+    ],
+  })
+  if (result.canceled || result.filePaths.length === 0) {
+    return { success: false }
+  }
+  const filePath = result.filePaths[0]
+  const buffer = fs.readFileSync(filePath)
+  return {
+    success: true,
+    filePath,
+    base64: buffer.toString('base64'),
+    mimeType: `audio/${filePath.endsWith('.mp3') ? 'mpeg' : filePath.endsWith('.wav') ? 'wav' : filePath.endsWith('.m4a') ? 'mp4' : filePath.endsWith('.aac') ? 'aac' : filePath.endsWith('.ogg') ? 'ogg' : 'mpeg'}`,
+  }
+})
+
+/**
+ * Select an image file using the system dialog.
+ */
+ipcMain.handle('select-image-file', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [
+      { name: '图片文件', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] },
+    ],
+  })
+  if (result.canceled || result.filePaths.length === 0) {
+    return { success: false }
+  }
+  const filePath = result.filePaths[0]
+  const buffer = fs.readFileSync(filePath)
+  const ext = filePath.split('.').pop()?.toLowerCase()
+  const mimeMap: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' }
+  return {
+    success: true,
+    filePath,
+    base64: buffer.toString('base64'),
+    mimeType: mimeMap[ext || ''] || 'image/png',
+  }
+})
+
 // ==================== Demo Project Seed ====================
 
 /**
